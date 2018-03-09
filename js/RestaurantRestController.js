@@ -33,6 +33,22 @@ var RestControllerModule = (function () {
 	return ord;
     };
 
+    var constructServerOrder = function (order) {
+	console.log(order);
+	var ord = {orderAmountsMap: {}, tableNumber: null};
+
+	ord.tableNumber = order.table_id;
+	for(i in order.products) {
+	    console.log(order.products[i]);
+	    var name = order.products[i].product;
+	    var quantity = order.products[i].quantity;
+
+	    ord.orderAmountsMap[name] = quantity;
+	}
+
+	return ord;
+    };
+
     var constructOrders = function (orders, products) {
 	var res = [];
 	
@@ -66,11 +82,22 @@ var RestControllerModule = (function () {
     };
 
     var updateOrder = function (order, callback) {
-	// todo implement
+	var serverOrder = constructServerOrder(order);
+	axios.put(server_url, serverOrder)
+	    .then(callback.onSuccess)
+	    .catch(function (error) {
+		console.log('ERROR: failed to send data to server');
+		callback.onFailed(error);
+	    });
     };
 
     var deleteOrder = function (orderId, callback) {
-	// todo implement
+	axios.delete(server_url + '/' + orderId)
+	    .then(callback.onSuccess)
+	    .catch(function (error) {
+		console.log('ERROR: failed to send data to server');
+		callback.onFailed(error);
+	    });
     };
 
     var createOrder = function (order, callback) {

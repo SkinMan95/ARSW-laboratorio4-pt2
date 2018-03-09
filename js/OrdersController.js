@@ -96,6 +96,23 @@ var OrdersControllerModule = (function () {
 
     var showOrdersOfTable = function (tableid = null) {
 	console.log(tableid); // TODO
+	// RestControllerModule.updateOrder({
+	//     order_id: 1,
+	//     table_id: 1,
+	//     products: [{
+	// 	product: "PIZZA",
+	// 	quantity: 3,
+	// 	price: "$15.000"
+	//     },
+	// 	       {
+	// 		   product: "HAMBURGER",
+	// 		   quantity: 1,
+	// 		   price: "$12.300"
+	// 	       }
+	// 	      ]
+	// }, {onSuccess: function(bla){}, onFailed: function(bla){console.log(bla);}});
+
+	// RestControllerModule.deleteOrder(3, {onSuccess: function(bla){}, onFailed: function(bla){console.log(bla);}});
     };
 
     return {
