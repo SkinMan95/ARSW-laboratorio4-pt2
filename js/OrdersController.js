@@ -60,7 +60,6 @@ var OrdersControllerModule = (function () {
     /* PUBLIC */
     
     var showOrdersByTable = function () {
-	//Todo implement
 	console.log("Funciona");
 
 	var callback = {
@@ -74,7 +73,7 @@ var OrdersControllerModule = (function () {
 		}
             },
             onFailed: function(exception){
-		// TODO mejorar
+		// TODO mejorar con una ventana emergente no nativa
 		console.log(exception);
 		alert('Fallo');
             }
@@ -95,11 +94,16 @@ var OrdersControllerModule = (function () {
 	// todo implement
     };
 
+    var showOrdersOfTable = function (tableid = null) {
+	console.log(tableid); // TODO
+    };
+
     return {
 	showOrdersByTable: showOrdersByTable,
 	updateOrder: updateOrder,
 	deleteOrderItem: deleteOrderItem,
-	addItemToOrder: addItemToOrder
+	addItemToOrder: addItemToOrder,
+	showOrdersOfTable : showOrdersOfTable
     };
 
 })();
