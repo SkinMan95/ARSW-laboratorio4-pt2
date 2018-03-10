@@ -86,7 +86,7 @@ var RestControllerModule = (function () {
 	axios.put(server_url, serverOrder)
 	    .then(callback.onSuccess)
 	    .catch(function (error) {
-		console.log('ERROR: failed to send data to server');
+		console.log('ERROR: failed to fetch data from server');
 		callback.onFailed(error);
 	    });
     };

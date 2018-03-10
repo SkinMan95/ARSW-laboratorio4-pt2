@@ -5,6 +5,8 @@ var OrdersControllerModule = (function () {
     var addTable = function (order) {
 	var tables = document.getElementById("order_tables");
 
+	assert(tables != null, 'ERROR: Could not get the order_tables element');
+
 	var table = document.createElement("table");
 	table.setAttribute("id", "table" + order.table_id);
 	table.setAttribute("class", "orders_table");
@@ -53,15 +55,61 @@ var OrdersControllerModule = (function () {
 	tables.appendChild(table);
     };
 
-    var clearTables = function () {
-	document.getElementById('order_tables').innerHTML = '';
+    var addOrdersUpdateTable = function (orders, tableid) {
+	console.log('tableid: ', tableid);
+	clearTables();
+
+	assert(orders.length > 0, 'there\'s are no orders available');
+
+	var order = orders.filter(function (e) {
+	    return e.table_id == tableid;
+	});
+
+	assert(order.length == 1, 'this should not happen');
+	console.log(order[0]);
+
+	changeAdditionTable(orders, tableid);
+	addUpdateTable(order[0]);
     };
+
+    var changeAdditionTable = function (orders, tableid) {
+	// TODO
+    };
+
+    var addUpdateTable = function (order) {
+	// TODO
+    };
+
+    var clearTables = function () {
+	// jQuery es una chimba!
+	$('#order_tables').html('');
+
+	$('.table_option').remove();
+	$('.table_item').remove();
+    };
+
+    var getOrders = function (callback) {
+	RestControllerModule.getOrders({
+	    onSuccess: callback.onSuccess,
+	    onFailed: callback.onFailed
+	});
+    };
+
+    var assert = function(condition, msg = null) {
+	if (!condition) {
+	    var assertMsg = 'Assertion Error';
+	    if (msg != null) {
+		assertMsg += ': ' + msg;
+	    }
+	    throw new Error(assertMsg);
+	}
+    };
+
+    var currentOrders = [];
 
     /* PUBLIC */
     
     var showOrdersByTable = function () {
-	console.log("Funciona");
-
 	var callback = {
 
             onSuccess: function(ordersList){
@@ -72,18 +120,16 @@ var OrdersControllerModule = (function () {
 		    addTable(ordersList[i]);
 		}
             },
-            onFailed: function(exception){
-		// TODO mejorar con una ventana emergente no nativa
+            onFailed: function (exception) {
 		console.log(exception);
-		alert('Fallo');
             }
 	};
 	
-	RestControllerModule.getOrders(callback);
+	getOrders(callback);
     };
 
     var updateOrder = function () {
-	// todo implement
+	// TODO
     };
 
     var deleteOrderItem = function (itemName) {
@@ -91,11 +137,53 @@ var OrdersControllerModule = (function () {
     };
 
     var addItemToOrder = function (orderId, item) {
-	// todo implement
+	var callback = {
+	    onSuccess : function (dummy) {
+		console.log(currentOrders);
+		var order = currentOrders.filter(function (e) {
+		    return orderId == e.table_id;
+		});
+		console.log(order);
+		assert(order.length == 1, "order not found " + order.length);
+		order = order[0];
+
+		var prod = order.products.filter(function (e){
+		    return e.product == item.product;
+		});
+
+		assert(prod.length == 0, 'item already exists ' + prod.length);
+
+		order.products.push(item);
+		RestControllerModule.updateOrder(order, {
+		    onSuccess: function (payload) {
+			showOrdersOfTable();
+		    },
+		    onFailed: function (error) {
+			console.log('ERROR updating the order: ' + error);
+		    }});
+	    },
+	    onFailed: function (error) {
+		console.log('Error adding item to order');
+	    }
+	};
+	
+	getOrders(callback);
     };
 
     var showOrdersOfTable = function (tableid = null) {
-	console.log(tableid); // TODO
+	console.log("tableid:", tableid);
+	
+	getOrders({
+	    onSuccess: function (payload) {
+		if (tableid == null) {
+		    tableid = payload[0].table_id;
+		}
+		addOrdersUpdateTable(payload, tableid);
+	    },
+	    onFailed: function (error) {
+		console.log(error);
+	    }});
+	
 	// RestControllerModule.updateOrder({
 	//     order_id: 1,
 	//     table_id: 1,
@@ -113,6 +201,8 @@ var OrdersControllerModule = (function () {
 	// }, {onSuccess: function(bla){}, onFailed: function(bla){console.log(bla);}});
 
 	// RestControllerModule.deleteOrder(3, {onSuccess: function(bla){}, onFailed: function(bla){console.log(bla);}});
+
+	// addItemToOrder(3, {product: 'HOTDOG', quantity: 4, price: "Esto no debe importar"});
     };
 
     return {
